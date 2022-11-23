@@ -11,16 +11,18 @@ export default function InputField(props) {
   function submitFormHandler(event) {
     event.preventDefault();
     const file = event.target[2]?.files[0];
-    if (!file) return;
-    const storageRef = ref(storage, `files/${file.name}`);
-    uploadBytes(storageRef, file);
+    if (file) {
+      const storageRef = ref(storage, `files/${file.name}`);
+      uploadBytes(storageRef, file);
+    }
+
     fetch('https://todo-app-f2649-default-rtdb.firebaseio.com/tasks.json', {
       method: 'POST',
       body: JSON.stringify({
         title: titleInput,
         task: taskInput,
         date: dateInput,
-        filename: file.name,
+        filename: file ? file.name : '',
       }),
     }).then(() => {
       setTitleInput('Enter your title');

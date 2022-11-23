@@ -1,0 +1,48 @@
+.tab {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.title {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  font-weight: 700;
+  color: #fff;
+  background: #1e3253;
+  cursor: pointer;
+}
+
+.title::after {
+  display: block;
+  content: '\25b6';
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  transition: all 0.1s;
+}
+
+.content {
+  background: rgb(219, 231, 241);
+  overflow: hidden;
+  transition: max-height 0.1s;
+  max-height: 0;
+}
+
+.content p {
+  padding: 10px;
+}
+
+.content span {
+  padding: 10px;
+}
+
+.content.active {
+  max-height: 100vh;
+}
+
+.title.active::after {
+  transform: rotate(90deg);
+}
