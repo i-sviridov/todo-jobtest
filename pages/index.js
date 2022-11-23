@@ -18,7 +18,10 @@ export default function Home() {
       const loadedTasks = [];
 
       for (const key in responseData) {
-        loadedTasks.push(responseData[key].task);
+        const taskObject = responseData[key];
+        taskObject.id = key;
+
+        loadedTasks.push(taskObject);
       }
 
       setLoadedTasks(loadedTasks);
@@ -26,8 +29,6 @@ export default function Home() {
     };
     fetchTasks();
   }, [isLoading]);
-
-  console.log(loadedTasks);
 
   return (
     <>
