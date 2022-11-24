@@ -26,10 +26,12 @@ export const storage = getStorage(app);
 
 const db = getFirestore();
 
-// get collection reference
 const collectionRef = collection(db, 'tasks');
 
-// get collection data
+/**
+ * функция для получения всех документов с firebase
+ * @return {array} возвращает массив элементов
+ */
 export function getDocuments() {
   return getDocs(collectionRef)
     .then((snapshot) => {
@@ -43,8 +45,14 @@ export function getDocuments() {
     .catch((err) => console.log(err));
 }
 
-// add document
-
+/**
+ * функция для добавления элемента в firebase
+ * @param {object} ивент, для preventDefault() и для аплоуда файлов
+ * @param {string} title заголовок элемента
+ * @param {string} task описание элемента
+ * @param {string} date дата выполнения элемента
+ * @return {object} возращает Promise
+ */
 export function addDocument(event, title, task, date) {
   event.preventDefault();
   const file = event.target[2]?.files[0];
@@ -60,7 +68,12 @@ export function addDocument(event, title, task, date) {
   });
 }
 
-// delete document
+/**
+ * функция для удаления элемента в firebase
+ * @param {object} event ивент, для preventDefault() и для аплоуда файлов
+ * @param {string} id ид элемента для создания рефа для удаления документа
+ * @return {object} Возвращает Promise
+ */
 
 export function deleteDocument(event, id) {
   event.preventDefault();
@@ -68,8 +81,15 @@ export function deleteDocument(event, id) {
   return deleteDoc(docRef);
 }
 
-// edit document
-
+/**
+ *
+ * @param {object} event ивент, для preventDefault() и для аплоуда файлов
+ * @param {string} title заголовок элемента
+ * @param {string} task описание элемента
+ * @param {string} date дата выполнения элемента
+ * @param {string} id ид элемента для создания рефа для изменения документа
+ * @return {object} Возвращает Promise
+ */
 export function editDocument(event, title, task, date, id) {
   event.preventDefault();
   const docRef = doc(db, 'tasks', id);

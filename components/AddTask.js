@@ -11,6 +11,11 @@ export default function AddTask(props) {
   );
   const [dateInput, setDateInput] = useState(props.date ? props.date : '');
 
+  /**
+   * функция для добавления/изменения элемента в firebase, обновления стэйтов
+   * @param {object} event ивент, для preventDefault() и для аплоуда файлов
+   */
+
   function submitFormHandler(event) {
     props
       .taskHandler(event, titleInput, taskInput, dateInput, props.id)
