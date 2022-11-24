@@ -82,7 +82,7 @@ export function deleteDocument(event, id) {
 }
 
 /**
- *
+ * функция для изменения элемента в firebase
  * @param {object} event ивент, для preventDefault() и для аплоуда файлов
  * @param {string} title заголовок элемента
  * @param {string} task описание элемента
