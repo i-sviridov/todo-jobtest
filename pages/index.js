@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 
 import AddTask from '../components/AddTask';
 import TaskList from '../components/TaskList';
+
 import {
   addDocument,
   deleteDocument,
+  editDocument,
   getDocuments,
-  storage,
 } from '../firebase';
 
 export default function Home() {
@@ -20,20 +21,9 @@ export default function Home() {
   }
 
   function editTaskHandler(event, title, task, date, id) {
-    const file = event.target[2]?.files[0];
-    if (file) {
-      const storageRef = ref(storage, `files/${file.name}`);
-      uploadBytes(storageRef, file);
-    }
-    event.preventDefault();
-    const docRef = doc(db, 'tasks', id);
-    const data = {
-      title,
-      task,
-      date,
-      filename: file ? file.name : '',
-    };
-    return updateDoc(docRef, data);
+    return editDocument(event, title, task, date, id).then(() => {
+      setIsFetchingDataApp(true);
+    });
   }
 
   function deleteTaskHandler(event, id) {

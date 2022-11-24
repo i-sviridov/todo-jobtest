@@ -6,6 +6,7 @@ import {
   addDoc,
   deleteDoc,
   doc,
+  updateDoc,
 } from 'firebase/firestore';
 import { ref, uploadBytes } from 'firebase/storage';
 import { getStorage } from 'firebase/storage';
@@ -62,8 +63,26 @@ export function addDocument(event, title, task, date) {
 // delete document
 
 export function deleteDocument(event, id) {
-  console.log(event, id);
   event.preventDefault();
   const docRef = doc(db, 'tasks', id);
   return deleteDoc(docRef);
+}
+
+// edit document
+
+export function editDocument(event, title, task, date, id) {
+  event.preventDefault();
+  const docRef = doc(db, 'tasks', id);
+
+  const file = event.target[2]?.files[0];
+  if (file) {
+    const storageRef = ref(storage, `files/${file.name}`);
+    uploadBytes(storageRef, file);
+  }
+  return updateDoc(docRef, {
+    title,
+    task,
+    date,
+    filename: file ? file.name : '',
+  });
 }

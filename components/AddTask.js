@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import classes from './dist/AddTask.module.css';
+import classes from './AddTask.module.css';
 
 export default function AddTask(props) {
   const [titleInput, setTitleInput] = useState(
@@ -18,6 +18,9 @@ export default function AddTask(props) {
         setTitleInput('Enter Your Title');
         setTaskInput('Enter Your Task');
         setDateInput('');
+        if (props.setIsEditMode) {
+          props.setIsEditMode(false);
+        }
       });
   }
 
@@ -57,7 +60,13 @@ export default function AddTask(props) {
       />
       <button>Submit</button>
       {props.isEditing && (
-        <button onClick={props.cancelEditing}>Cancel editing</button>
+        <button
+          onClick={() => {
+            props.cancelEditing(false);
+          }}
+        >
+          Cancel editing
+        </button>
       )}
     </form>
   );

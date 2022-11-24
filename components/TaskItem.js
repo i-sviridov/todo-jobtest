@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 
-import classes from './dist/TaskItem.module.css';
+import classes from './TaskItem.module.css';
 import AddTask from './AddTask';
 
 export default function TaskItem(props) {
@@ -16,8 +16,10 @@ export default function TaskItem(props) {
     const dateOfCompletion = new Date(props.data.date);
     if (currentDate > dateOfCompletion) {
       setIsTaskFinished(true);
+    } else {
+      setIsTaskFinished(false);
     }
-  }, [props]);
+  }, [props.data.date]);
 
   let renderedContent;
 
@@ -38,7 +40,16 @@ export default function TaskItem(props) {
             {props.data.title}
           </p>
         </div>
-        <AddTask taskHandler={props.editTaskHandler} id={props.data.id} />
+        <AddTask
+          taskHandler={props.editTaskHandler}
+          id={props.data.id}
+          setIsEditMode={setIsEditMode}
+          title={props.data.title}
+          task={props.data.task}
+          date={props.data.date}
+          isEditing
+          cancelEditing={setIsEditMode}
+        />
       </>
     );
   }
