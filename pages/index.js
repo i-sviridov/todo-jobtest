@@ -1,40 +1,67 @@
 import { useState, useEffect } from 'react';
 
-import InputField from '../components/InputField';
+import AddTask from '../components/AddTask';
 import TaskList from '../components/TaskList';
+import {
+  addDocument,
+  deleteDocument,
+  getDocuments,
+  storage,
+} from '../firebase';
 
 export default function Home() {
   const [loadedTasks, setLoadedTasks] = useState();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isFetchingDataApp, setIsFetchingDataApp] = useState(true);
+
+  function SubmitNewTaskHandler(event, title, task, date) {
+    return addDocument(event, title, task, date).then(() => {
+      setIsFetchingDataApp(true);
+    });
+  }
+
+  function editTaskHandler(event, title, task, date, id) {
+    const file = event.target[2]?.files[0];
+    if (file) {
+      const storageRef = ref(storage, `files/${file.name}`);
+      uploadBytes(storageRef, file);
+    }
+    event.preventDefault();
+    const docRef = doc(db, 'tasks', id);
+    const data = {
+      title,
+      task,
+      date,
+      filename: file ? file.name : '',
+    };
+    return updateDoc(docRef, data);
+  }
+
+  function deleteTaskHandler(event, id) {
+    console.log(event, id);
+    return deleteDocument(event, id).then(() => {
+      setIsFetchingDataApp(true);
+    });
+  }
 
   useEffect(() => {
-    const fetchTasks = async () => {
-      const response = await fetch(
-        'https://todo-app-f2649-default-rtdb.firebaseio.com/tasks.json'
-      );
-
-      const responseData = await response.json();
-
-      const loadedTasks = [];
-
-      for (const key in responseData) {
-        const taskObject = responseData[key];
-        taskObject.id = key;
-
-        loadedTasks.push(taskObject);
-      }
-
-      setLoadedTasks(loadedTasks);
-      setIsLoading(false);
+    const fetchTasks = () => {
+      getDocuments().then((loadedTasks) => {
+        setLoadedTasks(loadedTasks);
+        setIsFetchingDataApp(false);
+      });
     };
     fetchTasks();
-  }, [isLoading]);
+  }, [isFetchingDataApp]);
 
   return (
     <>
       <h1 className={'text-center'}>My Todo List</h1>
-      <InputField setIsLoading={setIsLoading} />
-      <TaskList data={loadedTasks} />
+      <AddTask taskHandler={SubmitNewTaskHandler} />
+      <TaskList
+        deleteTaskHandler={deleteTaskHandler}
+        editTaskHandler={editTaskHandler}
+        data={loadedTasks}
+      />
     </>
   );
 }

@@ -27,14 +27,23 @@
   transition: max-height 0.1s;
   max-height: 0;
 }
-.content p {
-  padding: 10px;
+.buttons {
+  margin: 1rem 0;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
 }
-.content span {
-  padding: 10px;
+.content p {
+  margin: 5px 0;
 }
 .content.active {
   max-height: 100vh;
+}
+.content.finished {
+  background: #777575;
+}
+.title.finished {
+  background: #3d3d3d;
 }
 .title.active::after {
   transform: rotate(90deg);

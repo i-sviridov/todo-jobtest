@@ -1,69 +1,124 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 
 import classes from './dist/TaskItem.module.css';
+import AddTask from './AddTask';
 
 export default function TaskItem(props) {
   const storage = getStorage();
 
-  const [isActive, setIsActive] = useState(false);
-  console.log(isActive);
-  let renderedContent = (
-    <div className={classes.tab}>
-      <p
-        onClick={() => {
-          setIsActive((prevValue) => {
-            return !prevValue;
-          });
-        }}
-        className={`${classes.title} ${isActive ? `${classes.active}` : ''}`}
-      >
-        {props.data.title}
-      </p>
-      <div
-        className={`${classes.content} ${isActive ? `${classes.active}` : ''}`}
-      >
-        <div class={['text-center']}>
-          <span>Task title:</span>
-          <span>{props.data.title}</span>
-        </div>
-        <div class={['text-center']}>
-          <span>Task name:</span>
-          <span>{props.data.task}</span>
-        </div>
-        <div class={['text-center']}>
-          <span>Estimated date of completion:</span>
-          <span>{props.data.date}</span>
-        </div>
-        <div class={['text-center']}>
-          <button
+  const [isOpened, setIsOpened] = useState(false);
+  const [isTaskFinished, setIsTaskFinished] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  useEffect(() => {
+    const currentDate = new Date();
+    const dateOfCompletion = new Date(props.data.date);
+    if (currentDate > dateOfCompletion) {
+      setIsTaskFinished(true);
+    }
+  }, [props]);
+
+  let renderedContent;
+
+  if (isEditMode) {
+    renderedContent = (
+      <>
+        <div className={classes.tab}>
+          <p
             onClick={() => {
-              getDownloadURL(ref(storage, `files/${props.data.filename}`)).then(
-                (url) => {
-                  // // `url` is the download URL for 'images/stars.jpg'
-                  // console.log(url);
-                  // // This can be downloaded directly:
-                  // const xhr = new XMLHttpRequest();
-                  // xhr.responseType = 'blob';
-                  // xhr.onload = (event) => {
-                  //   const blob = xhr.response;
-                  // };
-                  // xhr.open('GET', url);
-                  // xhr.send();
-                  const link = document.createElement('a');
-                  link.setAttribute('download', '');
-                  link.setAttribute('href', url);
-                  link.click();
-                }
-              );
+              setIsOpened((prevValue) => {
+                return !prevValue;
+              });
             }}
+            className={`${classes.title} ${
+              isOpened ? `${classes.active}` : ''
+            } ${isTaskFinished ? `${classes.finished}` : ''}`}
           >
-            Download your attachment
-          </button>
+            {props.data.title}
+          </p>
+        </div>
+        <AddTask taskHandler={props.editTaskHandler} id={props.data.id} />
+      </>
+    );
+  }
+
+  if (!isEditMode) {
+    renderedContent = (
+      <div className={classes.tab}>
+        <p
+          onClick={() => {
+            setIsOpened((prevValue) => {
+              return !prevValue;
+            });
+          }}
+          className={`${classes.title} ${isOpened ? `${classes.active}` : ''} ${
+            isTaskFinished ? `${classes.finished}` : ''
+          }`}
+        >
+          {props.data.title}
+        </p>
+        <div
+          className={`${classes.content} ${
+            isOpened ? `${classes.active}` : ''
+          } ${isTaskFinished ? `${classes.finished}` : ''}`}
+        >
+          <p className={['text-center']}>{props.data.title}</p>
+          <p className={['text-center']}>{props.data.task}</p>
+          <p className={['text-center']}>
+            Estimated date of completion: {props.data.date}
+          </p>
+          <div className={['text-center']}>
+            <button
+              onClick={() => {
+                getDownloadURL(
+                  ref(storage, `files/${props.data.filename}`)
+                ).then((url) => {
+                  var xhr = new XMLHttpRequest();
+                  xhr.responseType = 'blob';
+                  xhr.onload = function () {
+                    var a = document.createElement('a');
+                    a.href = window.URL.createObjectURL(xhr.response);
+                    a.download = '';
+                    a.style.display = 'none';
+                    document.body.appendChild(a);
+                    a.click();
+                  };
+                  xhr.open('GET', url);
+                  xhr.send();
+                });
+              }}
+            >
+              Download your attachment
+            </button>
+          </div>
+          <div className={classes.buttons}>
+            <button
+              onClick={() => {
+                setIsTaskFinished((prevValue) => !prevValue);
+              }}
+            >
+              {isTaskFinished ? 'Activate' : 'Finish'}
+            </button>
+            <button
+              onClick={() => {
+                setIsEditMode(true);
+              }}
+            >
+              Edit
+            </button>
+            <button
+              onClick={(event) => {
+                props.deleteTaskHandler(event, props.data.id);
+              }}
+            >
+              Delete
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   return renderedContent;
 }
